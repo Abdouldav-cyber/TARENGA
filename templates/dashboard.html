@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mon Tableau de Bord - Teranga 2027" %}{% endblock %}
+
+{% block content %}
+<style>
+/* Override default base layout to create raw SaaS Full Screen */
+body { margin: 0; padding: 0; background: #f1f5f9 !important; overflow-x: hidden; }
+.app-container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; display: block; }
+.glass-nav, .app-footer { display: none !important; } /* Cacher ancienne nav */
+.page-content { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+
+/* Dashboard UI Structure */
+.cli-dashboard {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Outfit', sans-serif;
+}
+.cli-sidebar {
+    width: 260px;
+    background: #0f172a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+.cli-sidebar-header {
+    padding: 25px 20px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #ffffff;
+    border-bottom: 1px solid #1e293b;
+    text-align: center;
+}
+.cli-nav {
+    flex: 1;
+    padding: 20px 0;
+}
+.cli-nav-item {
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    transition: 0.3s;
+    cursor: pointer;
+    border-left: 4px solid transparent;
+}
+.cli-nav-item:hover, .cli-nav-item.active {
+    background: #1e293b;
+    color: #38bdf8;
+    border-left: 4px solid #38bdf8;
+}
+.cli-nav-item span.icon {
+    font-size: 1.3rem;
+    margin-right: 15px;
+}
+
+.cli-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f1f5f9;
+}
+.cli-topbar {
+    height: 75px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+.cli-content-area {
+    padding: 40px;
+    flex: 1;
+}
+
+.cli-tab-pane {
+    display: none;
+    animation: fadeIn 0.4s ease-in-out;
+}
+.cli-tab-pane.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards & Content */
+.cli-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+}
+.cli-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+.cli-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.cli-stat-label { color: #64748b; font-weight: 500; }
+.cli-stat-value { font-weight: 800; font-size: 1.1rem; color: #0f172a; }
+
+/* Responsive Alert */
+@media (max-width: 768px) {
+    .cli-sidebar { display: none; }
+    .cli-topbar { padding: 0 20px; }
+    .cli-content-area { padding: 20px; }
+}
+</style>
+
+<div class="cli-dashboard">
+    <!-- Sidebar -->
+    <div class="cli-sidebar">
+        <div class="cli-sidebar-header">TERANGA <span style="color:#38bdf8;">2027</span></div>
+        <div class="cli-nav">
+            <div class="cli-nav-item active" onclick="switchTab('tab-paiement', this)">
+                <span class="icon" style="width: 25px;"><i class="fa-solid fa-wallet"></i></span> {% trans "Caisse & Paiements" %}
+            </div>
+            <div class="cli-nav-item" onclick="switchTab('tab-billet', this)">
+                <span class="icon" style="width: 25px;"><i class="fa-solid fa-ticket-simple"></i></span> {% trans "Mon E-Billet" %}
+            </div>
+            <div class="cli-nav-item" onclick="switchTab('tab-logistica', this)">
+                <span class="icon" style="width: 25px;"><i class="fa-solid fa-suitcase"></i></span> {% trans "Ma Logistique" %}
+            </div>
+            <div style="border-top:1px solid #1e293b; margin:20px 0;"></div>
+            <a href="{% url 'core:logout_view' %}" class="cli-nav-item" style="color:#ef4444;">
+                <span class="icon" style="width: 25px;"><i class="fa-solid fa-arrow-right-from-bracket"></i></span> {% trans "Déconnexion" %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="cli-main">
+        <div class="cli-topbar">
+            <div>
+                <h2 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin:0;">{% trans "Bonjour," %} <span style="color:#38bdf8;">{{ participant.first_name }}</span> <i class="fa-solid fa-hand-wave" style="color: #f59e0b; margin-left:8px;"></i></h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <!-- Sélecteur de Langue -->
+                <select onchange="window.location.href='/i18n/setlang/?language=' + this.value" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 5px 10px; font-weight: 600; color: #475569; outline: none; cursor: pointer; background: white;">
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="pt">🇵🇹 PT</option>
+                </select>
+
+                <!-- Badge du Rôle -->
+                <span style="background: #e0f2fe; color: #0284c7; padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(2,132,199,0.1);">{{ participant.get_type_participant_display }}</span>
+            </div>
+        </div>
+
+        <div class="cli-content-area">
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #dcfce7; border-left: 4px solid #22c55e; color: #166534; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; font-weight: 600;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- ONGLET 1: PAIEMENT -->
+            <div id="tab-paiement" class="cli-tab-pane active">
+                <div class="cli-card">
+                    <h3 class="cli-title">{% trans "Résumé Facturation" %}</h3>
+                    <div class="cli-stat-row">
+                        <span class="cli-stat-label">{% trans "Total à régler" %}</span>
+                        <span class="cli-stat-value">{{ payment.amount_total }} FCFA</span>
+                    </div>
+                    <div class="cli-stat-row">
+                        <span class="cli-stat-label">{% trans "Montant déjà payé" %}</span>
+                        <span class="cli-stat-value" style="color: #22c55e;">{{ payment.amount_paid }} FCFA</span>
+                    </div>
+                    <div class="cli-stat-row" style="border-bottom:none;">
+                        <span class="cli-stat-label">{% trans "Statut Actuel" %}</span>
+                        <span>
+                            {% if payment.status == 'paye' %}
+                                <span style="background: #dcfce7; color: #166534; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.9rem;"><i class="fa-solid fa-circle-check"></i> {% trans "Payé et Complet" %}</span>
+                            {% elif payment.status == 'partiel' %}
+                                <span style="background: #fef3c7; color: #b45309; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.9rem;"><i class="fa-solid fa-hourglass-half"></i> {% trans "Paiement Partiel" %}</span>
+                            {% else %}
+                                <span style="background: #fee2e2; color: #b91c1c; padding: 6px 15px; border-radius: 20px; font-weight: 800; font-size: 0.9rem;"><i class="fa-solid fa-circle-xmark"></i> {% trans "Non Payé" %}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% if payment.status != 'paye' %}
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-top: 25px; text-align: center;">
+                        <p style="font-size: 0.95rem; color: #475569; font-weight: 600; margin-bottom: 20px;">{% trans "Finalisez votre règlement via nos passerelles sécurisées :" %}</p>
+                        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                            <a href="{% url 'core:process_payment' 'wave' %}" class="pay-btn" data-name="Wave Mobile Money" data-color="#00a8e8" style="display: flex; align-items: center; justify-content: center; padding: 12px 25px; background: #00a8e8; color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.95rem; min-width: 170px; box-shadow: 0 4px 10px rgba(0,168,232,0.3); transition: transform 0.2s;">
+                                <img src="https://www.wave.com/en/wp-content/themes/wave/assets/img/logo-white.svg" alt="Wave Logo" style="height: 18px; margin-right: 12px;" onerror="this.style.display='none';">
+                                Wave Money
+                            </a>
+                            <a href="{% url 'core:process_payment' 'om' %}" class="pay-btn" data-name="Orange Money" data-color="#ff6600" style="display: flex; align-items: center; justify-content: center; padding: 12px 25px; background: #000000; color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.95rem; min-width: 170px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s;">
+                                <div style="background: #ff6600; width: 22px; height: 22px; margin-right: 12px; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: white; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif;">or</span>
+                                </div>
+                                Orange Money
+                            </a>
+                            <a href="{% url 'core:process_payment' 'cb' %}" class="pay-btn" data-name="Carte Bancaire" data-color="#1e293b" style="display: flex; align-items: center; justify-content: center; padding: 12px 25px; background: #1e293b; color: white; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.95rem; min-width: 170px; box-shadow: 0 4px 10px rgba(30,41,59,0.3); transition: transform 0.2s;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Carte Bancaire
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ONGLET 2: BILLET -->
+            <div id="tab-billet" class="cli-tab-pane">
+                <div class="cli-card" style="position:relative; overflow:hidden;">
+                    {% if payment.status != 'paye' %}
+                    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display:flex; justify-content:center; align-items:center; z-index: 10;">
+                        <div style="text-align: center; max-width: 300px;">
+                            <span style="font-size: 3.5rem; color: #cbd5e1;"><i class="fa-solid fa-lock"></i></span>
+                            <p style="color: #0f172a; font-weight: 800; font-size: 1.1rem; margin-top: 15px;">Accès Verrouillé</p>
+                            <p style="color: #64748b; font-size: 0.9rem;">Veuillez régler vos frais dans l'onglet "Caisse" pour débloquer votre e-billet.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <h3 class="cli-title">{% trans "Votre E-Billet Personnel" %}</h3>
+                    <div style="text-align: center; padding: 20px 0;">
+                        <p style="color: #475569; font-size: 0.95rem; margin-bottom: 25px;">{% trans "Ce QR Code crypté est votre sésame d'entrée pour l'événement. Présentez-le aux points de contrôle." %}</p>
+                        
+                        {% if logistics and logistics.qr_code %}
+                            <div style="display:inline-block; padding:15px; background:white; border:4px solid #38bdf8; border-radius:16px; box-shadow: 0 10px 25px rgba(56,189,248,0.2);">
+                                <img src="{{ logistics.qr_code.url }}" alt="Billet QR Code" style="width: 200px; height: 200px; display: block;">
+                            </div>
+                            <h2 style="margin-top: 20px; color: #0f172a; font-weight: 900; letter-spacing: 2px;">{% trans "BILLET VALIDÉ" %}</h2>
+                            <p style="color: #22c55e; font-weight: 700;"><span style="font-size: 1.2rem;"><i class="fa-solid fa-check"></i></span> {% trans "Prêt pour Teranga 2027" %}</p>
+                        {% else %}
+                            <div style="width: 200px; height: 200px; background: #f8fafc; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 3px dashed #cbd5e1; color: #94a3b8; font-weight: 700; text-align: center; font-size: 0.9rem; padding: 20px;">
+                                {% trans "Le code source sera généré ici" %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 3: LOGISTIQUE -->
+            <div id="tab-logistica" class="cli-tab-pane">
+                <div class="cli-card" style="position:relative; overflow:hidden;">
+                    {% if payment.status != 'paye' %}
+                    <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); display:flex; justify-content:center; align-items:center; z-index: 10;">
+                        <div style="text-align: center; max-width: 300px;">
+                            <span style="font-size: 3.5rem; color: #cbd5e1;"><i class="fa-solid fa-suitcase-rolling"></i></span>
+                            <p style="color: #0f172a; font-weight: 800; font-size: 1.1rem; margin-top: 15px;">Dossier en attente</p>
+                            <p style="color: #64748b; font-size: 0.9rem;">Votre logistique sera programmée après validation du paiement.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <h3 class="cli-title">{% trans "Vos Informations de Séjour" %}</h3>
+                    
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <span style="font-size: 1.8rem; color: #38bdf8;"><i class="fa-solid fa-plane-arrival"></i></span>
+                            <p style="color: #64748b; font-size: 0.85rem; font-weight: 600; margin-top: 10px; margin-bottom: 5px;">{% trans "Arrivée à Dakar (AIBD)" %}</p>
+                            <div style="font-weight: 800; color: #0f172a; font-size: 1.1rem;">{{ logistics.arrival_datetime|default:"Date non planifiée" }}</div>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 200px; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <span style="font-size: 1.8rem; color: #38bdf8;"><i class="fa-solid fa-bed"></i></span>
+                            <p style="color: #64748b; font-size: 0.85rem; font-weight: 600; margin-top: 10px; margin-bottom: 5px;">{% trans "Hébergement attribué" %}</p>
+                            <div style="font-weight: 800; color: #0f172a; font-size: 1.1rem;">{{ logistics.hotel_name|default:"Assignation en cours..." }}</div>
+                            <div style="color: #38bdf8; font-weight: 700; font-size: 0.9rem; margin-top: 5px;">{% trans "Chambre Vol." %} {{ logistics.room_number|default:"-" }}</div>
+                        </div>
+
+                        <div style="flex: 1; min-width: 200px; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <span style="font-size: 1.8rem; color: #38bdf8;"><i class="fa-solid fa-bus"></i></span>
+                            <p style="color: #64748b; font-size: 0.85rem; font-weight: 600; margin-top: 10px; margin-bottom: 5px;">{% trans "Transport Interne" %}</p>
+                            <div style="font-weight: 800; color: #0f172a; font-size: 1.1rem;">{{ logistics.transport_mode|default:"Non spécifié" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Tab Switching Logic
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.cli-nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.cli-tab-pane').forEach(el => el.classList.remove('active'));
+        
+        element.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // Payment UX Flow Logic
+    document.querySelectorAll('.pay-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            const provider = this.getAttribute('data-name');
+            const color = this.getAttribute('data-color');
+            
+            let modalHtml = '';
+            
+            if (provider === 'Carte Bancaire') {
+                modalHtml = `
+                <div style="text-align:left; background:#f8fafc; padding:25px; border-radius:12px; margin-top:10px; border:1px solid #e2e8f0; font-family:'Outfit', sans-serif;">
+                    <label style="font-size:0.75rem; font-weight:800; color:#475569; letter-spacing:1px; display:block;">NUMÉRO DE CARTE</label>
+                    <div style="display:flex; align-items:center; background:white; border:2px solid #cbd5e1; border-radius:8px; padding:12px; margin-bottom:20px; margin-top:5px; box-sizing:border-box; transition: 0.2s;">
+                        <span style="margin-right:12px; font-size:1.3rem; color: #1e293b;"><i class="fa-solid fa-credit-card"></i></span>
+                        <input type="tel" autocomplete="off" placeholder="0000 0000 0000 0000" maxlength="19" style="border:none; outline:none; width:100%; font-family:monospace; font-size:1.2rem; color:#1e293b; background:transparent; font-weight: 700;">
+                    </div>
+                    <div style="display:flex; gap:15px;">
+                        <div style="flex:1;">
+                            <label style="font-size:0.75rem; font-weight:800; color:#475569; letter-spacing:1px; display:block;">EXPIRATION</label>
+                            <input type="tel" autocomplete="off" placeholder="MM/AA" maxlength="5" style="width:100%; box-sizing:border-box; padding:12px; border:2px solid #cbd5e1; border-radius:8px; outline:none; font-family:monospace; font-size:1.1rem; font-weight: 700; margin-top:5px; background:white;">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:0.75rem; font-weight:800; color:#475569; letter-spacing:1px; display:block;">CVC / CVV</label>
+                            <input type="password" autocomplete="new-password" placeholder="123" maxlength="3" style="width:100%; box-sizing:border-box; padding:12px; border:2px solid #cbd5e1; border-radius:8px; outline:none; font-family:monospace; font-size:1.1rem; font-weight: 700; margin-top:5px; background:white;">
+                        </div>
+                    </div>
+                    <div style="margin-top:20px;">
+                         <label style="font-size:0.75rem; font-weight:800; color:#475569; letter-spacing:1px; display:block;">NOM DU TITULAIRE</label>
+                         <input type="text" autocomplete="off" placeholder="Ex: Jean Dupont" style="width:100%; box-sizing:border-box; padding:12px; border:2px solid #cbd5e1; border-radius:8px; outline:none; font-size:1.1rem; font-weight: 700; margin-top:5px; background:white; text-transform:uppercase;">
+                    </div>
+                </div>
+                `;
+            } else if (provider === 'Wave Mobile Money') {
+                modalHtml = `
+                    <div style="text-align:center; padding:15px; margin-top:5px;">
+                        <p style="font-size:0.95rem; color:#475569; margin-bottom:20px; font-weight: 500;">Entrez votre numéro pour recevoir l'alerte de validation dynamique sur votre application Wave.</p>
+                        
+                        <div style="display:flex; border:3px solid #00a8e8; border-radius:10px; width:95%; margin:0 auto; background:white; overflow:hidden; box-shadow: 0 4px 10px rgba(0,168,232,0.15);">
+                            <select style="border:none; outline:none; background:#f0f9ff; padding:15px; font-weight:800; color:#00a8e8; border-right:2px solid #e0f2fe; cursor:pointer; font-size: 1.1rem;">
+                                <option value="+221">🇸🇳 +221</option>
+                                <option value="+225">🇨🇮 +225</option>
+                                <option value="+226">🇧🇫 +226</option>
+                                <option value="+223">🇲🇱 +223</option>
+                                <option value="+224">🇬🇳 +224</option>
+                            </select>
+                            <input type="tel" autocomplete="off" placeholder="Numéro Wave" style="flex:1; border:none; outline:none; padding:15px; font-size:1.25rem; font-weight:800; color:#1e293b;">
+                        </div>
+                    </div>
+                `;
+            } else {
+                modalHtml = `
+                    <div style="text-align:center; padding:15px; margin-top:5px;">
+                        <p style="font-size:0.95rem; color:#475569; margin-bottom:20px; font-weight: 500;">Saisissez votre numéro ainsi que le code d'autorisation Orange Money.</p>
+                        
+                        <div style="display:flex; border:3px solid #ff6600; border-radius:10px; width:95%; margin:0 auto 15px auto; background:white; overflow:hidden; box-shadow: 0 4px 10px rgba(255,102,0,0.15);">
+                            <select style="border:none; outline:none; background:#fff7ed; padding:15px; font-weight:800; color:#ff6600; border-right:2px solid #ffedd5; cursor:pointer; font-size: 1.1rem;">
+                                <option value="+221">🇸🇳 +221</option>
+                                <option value="+225">🇨🇮 +225</option>
+                                <option value="+226">🇧🇫 +226</option>
+                                <option value="+223">🇲🇱 +223</option>
+                                <option value="+224">🇬🇳 +224</option>
+                            </select>
+                            <input type="tel" autocomplete="off" placeholder="Numéro Orange" style="flex:1; border:none; outline:none; padding:15px; font-size:1.25rem; font-weight:800; color:#1e293b;">
+                        </div>
+
+                        <input type="password" autocomplete="new-password" placeholder="Code Secret / OTP" style="width:95%; box-sizing:border-box; padding:15px; border:2px solid #cbd5e1; border-radius:10px; outline:none; font-size:1.2rem; font-weight: 800; text-align:center; color:#1e293b;">
+                    </div>
+                `;
+            }
+            
+            Swal.fire({
+                title: 'Paiement Sécurisé',
+                html: modalHtml,
+                showCancelButton: true,
+                confirmButtonColor: color,
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Payer & Valider',
+                cancelButtonText: 'Annuler',
+                reverseButtons: true,
+                shape: 'border-radius: 16px',
+                width: '500px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Paiement en cours...',
+                        text: 'Simulation de la passerelle API. Veuillez patienter.',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading() }
+                    });
+                    setTimeout(() => { window.location.href = url; }, 1200);
+                }
+            })
+        });
+    });
+</script>
+<style>
+    .no-border { border: none !important; font-size: 3rem; }
+    div:where(.swal2-container) div:where(.swal2-popup) { font-family: 'Outfit', sans-serif; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+    div:where(.swal2-container) h2:where(.swal2-title) { font-weight: 900; color: #0f172a; margin-bottom: 20px;}
+    div:where(.swal2-container) button:where(.swal2-styled) { font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 12px 25px; }
+</style>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Inscriptions par Événement</h1>
+        <p style="color: #64748b; margin-top: 5px;">Gérez les inscriptions de chaque réseau de manière isolée.</p>
+    </div>
+</div>
+
+<!-- SECTION ROTARY -->
+<div style="margin-bottom: 50px;">
+    <h2 style="font-size: 1.3rem; color: #1e293b; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fa-solid fa-gear" style="color: #64748b; margin-right: 8px;"></i> Inscrits Rotary (ACD)</span>
+        <span class="badge" style="background: #e0f2fe; color: #0284c7; padding: 6px 15px; border-radius: 20px;">{{ rotary_payments.count }} Participant(s)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom & Prénom</th>
+                <th>Type / Club</th>
+                <th>Statut Paiement</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p_payment in rotary_payments %}
+            <tr>
+                <td>
+                    <strong>{{ p_payment.participant.first_name }} {{ p_payment.participant.last_name }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #64748b;">{{ p_payment.participant.email }}</span>
+                </td>
+                <td>
+                    <span class="badge" style="background: #e2e8f0; color: #475569;">{{ p_payment.participant.get_type_participant_display }}</span><br>
+                    <span style="font-size: 0.8rem; color: #64748b; margin-top: 5px; display: inline-block;"><i class="fa-solid fa-building-user"></i> {{ p_payment.participant.club }}</span>
+                </td>
+                <td>
+                    {% if p_payment.status == 'paye' %}
+                        <span class="badge badge-success"><i class="fa-solid fa-check"></i> Payé</span>
+                    {% else %}
+                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> En attente ({{ p_payment.amount_total }} CFA)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p_payment.status != 'paye' %}
+                        <a href="{% url 'core:admin_validate_payment' p_payment.id %}" class="action-btn btn-validate" onclick="return confirm('La logistique sera débloquée ! Valider manuellement le paiement ?');">
+                            Valider
+                        </a>
+                    {% else %}
+                        <span style="color: #10b981; font-size: 0.8rem; font-weight: 700; margin-right: 10px;">✓ Validé</span>
+                    {% endif %}
+                    
+                    <a href="{% url 'core:admin_participant_delete' p_payment.participant.id %}" class="action-btn" style="background: #fee2e2; color: #ef4444; margin-left: 10px;" onclick="return confirm('⚠️ DANGER : Êtes-vous certain de vouloir supprimer totalement ce participant ?');">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #94a3b8;">Aucun inscrit pour le Rotary pour l'instant.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- SECTION ROTARACT -->
+<div style="margin-bottom: 40px;">
+    <h2 style="font-size: 1.3rem; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fa-solid fa-handshake" style="color: #f59e0b; margin-right: 8px;"></i> Inscrits Rotaract (ACD)</span>
+        <span class="badge" style="background: #fef3c7; color: #d97706; padding: 6px 15px; border-radius: 20px;">{{ rotaract_payments.count }} Participant(s)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom & Prénom</th>
+                <th>Type / Club</th>
+                <th>Statut Paiement</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p_payment in rotaract_payments %}
+            <tr>
+                <td>
+                    <strong>{{ p_payment.participant.first_name }} {{ p_payment.participant.last_name }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #64748b;">{{ p_payment.participant.email }}</span>
+                </td>
+                <td>
+                    <span class="badge" style="background: #e2e8f0; color: #475569;">{{ p_payment.participant.get_type_participant_display }}</span><br>
+                    <span style="font-size: 0.8rem; color: #64748b; margin-top: 5px; display: inline-block;"><i class="fa-solid fa-building-user"></i> {{ p_payment.participant.club }}</span>
+                </td>
+                <td>
+                    {% if p_payment.status == 'paye' %}
+                        <span class="badge badge-success"><i class="fa-solid fa-check"></i> Payé</span>
+                    {% else %}
+                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> En attente ({{ p_payment.amount_total }} CFA)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p_payment.status != 'paye' %}
+                        <a href="{% url 'core:admin_validate_payment' p_payment.id %}" class="action-btn btn-validate" onclick="return confirm('La logistique sera débloquée ! Valider manuellement le paiement ?');">
+                            Valider
+                        </a>
+                    {% else %}
+                        <span style="color: #10b981; font-size: 0.8rem; font-weight: 700; margin-right: 10px;">✓ Validé</span>
+                    {% endif %}
+                    
+                    <a href="{% url 'core:admin_participant_delete' p_payment.participant.id %}" class="action-btn" style="background: #fee2e2; color: #ef4444; margin-left: 10px;" onclick="return confirm('⚠️ DANGER : Êtes-vous certain de vouloir supprimer totalement ce participant ?');">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #94a3b8;">Aucun inscrit pour le Rotaract pour l'instant.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Teranga 2027{% endblock %}
+
+{% block content %}
+<style>
+    /* CSS EMBARQUÉ POUR FORCER LE RAFRAÎCHISSEMENT (ANTI-CACHE BROWSER) */
+    .premium-hero {
+        text-align: center;
+        padding: 40px 20px;
+        background: radial-gradient(circle at top, #f0f8ff, transparent 70%);
+        border-radius: 24px;
+        margin-bottom: 20px;
+    }
+    .premium-hero h1 {
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: #0f172a;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+    }
+    .premium-hero p.subtitle {
+        font-size: 1.1rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto 40px auto;
+    }
+    
+    .premium-cards-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .p-card {
+        flex: 1;
+        min-width: 250px;
+        max-width: 300px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 40px 30px;
+        text-align: center;
+        text-decoration: none;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .p-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 6px;
+        background: var(--color-primary);
+        opacity: 0;
+        transition: 0.3s;
+    }
+    
+    .p-card:hover {
+        transform: translateY(-10px);
+        border-color: transparent;
+        box-shadow: 0 20px 40px rgba(21, 101, 192, 0.15);
+    }
+    
+    .p-card:hover::before {
+        opacity: 1;
+    }
+    
+    .p-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        display: inline-block;
+        transition: 0.3s;
+    }
+    
+    .p-card:hover .p-icon {
+        transform: scale(1.15) rotate(5deg);
+    }
+    
+    .p-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 10px;
+    }
+    
+    .p-date {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+    
+    .p-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+        color: var(--color-primary);
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: 0.3s;
+    }
+    
+    .p-card:hover .p-btn {
+        background: var(--color-primary);
+        color: white;
+        box-shadow: 0 5px 15px rgba(21, 101, 192, 0.3);
+    }
+    
+    /* CSS POUR LA BANNIÈRE DÉFILANTE */
+    .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+        background: linear-gradient(90deg, #1e293b, #0f172a);
+        color: #38bdf8;
+        padding: 12px 0;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        margin-top: -25px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
+    }
+    .ticker-content {
+        display: inline-block;
+        white-space: nowrap;
+        animation: ticker 40s linear infinite;
+        letter-spacing: 0.5px;
+    }
+    .ticker-content:hover {
+        animation-play-state: paused;
+    }
+    @keyframes ticker {
+        0% { transform: translateX(100vw); }
+        100% { transform: translateX(-100%); }
+    }
+    .ticker-badge {
+        background: #38bdf8;
+        color: #0f172a;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        margin-right: 10px;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="premium-hero fade-in-up">
+    <!-- BANNIÈRE DÉFILANTE (TICKER) -->
+    <div class="ticker-wrap">
+        <div class="ticker-content" id="live-countdown-ticker">
+            Calcul du compte à rebours en cours...
+        </div>
+    </div>
+
+    <h1>L'Expérience <span style="color:#1565c0;">Téranga Pûre</span></h1>
+    
+    {% if request.user.is_authenticated %}
+        <p class="subtitle" style="color: #4CAF50; font-weight: bold;">
+            ✅ Vous êtes déjà connecté en tant que {{ request.user.username }} !
+        </p>
+        
+        <div class="glass-card" style="text-align: center; border-color: var(--color-rotary);">
+            <h2 style="font-size: 1.3rem; margin-bottom: 15px;">Heureux de vous revoir</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Que souhaitez-vous faire aujourd'hui ?</p>
+            
+            {% if request.user.is_staff or request.user.is_superuser %}
+                <a href="{% url 'core:custom_admin_dashboard' %}" class="glass-btn" style="display: block; background: #0f172a; text-decoration: none;">
+                    ⚙️ Ouvrir le WebAdmin (SaaS)
+                </a>
+            {% else %}
+                <a href="{% url 'core:dashboard' %}" class="glass-btn" style="display: block; margin-bottom: 10px; text-decoration: none;">
+                    📊 Accéder à mon Billet de Voyage
+                </a>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <p class="subtitle">Sélectionnez le réseau pour entamer votre processus d'accréditation et accéder à l'événement.</p>
+        
+        <div class="premium-cards-wrapper">
+            <!-- Carte Rotary -->
+            <a href="{% url 'core:register' %}?event=rotary" class="p-card">
+                <span class="p-icon"><i class="fa-solid fa-gear" style="color: #64748b;"></i></span>
+                <h2 class="p-title">Rotary (ACD)</h2>
+                <div class="p-date">Mar 20 – Dim 25 Avril 2027</div>
+                <div class="p-btn">S'inscrire <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></div>
+            </a>
+
+            <!-- Carte Rotaract -->
+            <a href="{% url 'core:register' %}?event=rotaract" class="p-card">
+                <span class="p-icon"><i class="fa-solid fa-handshake" style="color: #f59e0b;"></i></span>
+                <h2 class="p-title">Rotaract (ACD)</h2>
+                <div class="p-date">Mer 28 Avr – Dim 2 Mai 2027</div>
+                <div class="p-btn">S'inscrire <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></div>
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Dates cibles des événements
+        const rotaryDate = new Date("2027-04-20T00:00:00");
+        const rotaractDate = new Date("2027-04-28T00:00:00");
+        const now = new Date();
+        
+        // Calcul des jours restants
+        const daysToRotary = Math.ceil((rotaryDate - now) / (1000 * 60 * 60 * 24));
+        const daysToRotaract = Math.ceil((rotaractDate - now) / (1000 * 60 * 60 * 24));
+        
+        // Construction du message dynamique
+        let message = `<span class="ticker-badge"><i class="fa-solid fa-bolt"></i> Flash Info</span> <i class="fa-solid fa-rocket"></i> L'événement <b>Rotary (ACD)</b> débute dans <span style="color:#fbbf24; font-size:1.1rem;">${daysToRotary} jours</span> (Mardi 20 - Dimanche 25 Avril) ! `;
+        message += ` &nbsp;|&nbsp; <i class="fa-solid fa-star"></i> Préparez-vous pour le <b>Rotaract (ACD)</b> dans <span style="color:#fbbf24; font-size:1.1rem;">${daysToRotaract} jours</span> (Mercredi 28 Avril - Dimanche 2 Mai) ! `;
+        message += ` &nbsp;|&nbsp; <i class="fa-solid fa-ticket"></i> <i>Les inscriptions sont ouvertes, réservez vite vos places.</i> `;
+        
+        // On duplique le message pour créer un effet de boucle fluide
+        const tickerSpacer = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        document.getElementById('live-countdown-ticker').innerHTML = message + tickerSpacer + message + tickerSpacer + message;
+    });
+</script>
+{% endblock %}

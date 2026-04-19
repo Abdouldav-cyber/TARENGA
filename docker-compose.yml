@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15
+    container_name: teranga_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=teranga_db
+      - POSTGRES_USER=teranga_user
+      - POSTGRES_PASSWORD=teranga_pass
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: teranga_django
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_DB=teranga_db
+      - POSTGRES_USER=teranga_user
+      - POSTGRES_PASSWORD=teranga_pass
+      - POSTGRES_HOST=db
+
+volumes:
+  postgres_data:

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription - Teranga 2027{% endblock %}
+
+{% block content %}
+<div class="hero-section fade-in-up" style="margin-top: 10px;">
+    <h1 style="font-size: 1.8rem;">Inscription <span class="highlight-gradient">{{ event_type|title }}</span></h1>
+    <p class="subtitle" style="margin-bottom: 20px; font-size: 0.9rem;">
+        Veuillez remplir vos informations pour finaliser votre dossier.
+    </p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="glass-card" style="border-color: #4CAF50; color: #4CAF50; margin-bottom: 20px; padding: 15px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="glass-card form-card">
+        <form method="POST" action="">
+            {% csrf_token %}
+            
+            <h3 class="form-section-title">Informations Personnelles</h3>
+            
+            <div class="form-group row-group">
+                <div class="input-wrapper">
+                    <label>Prénom</label>
+                    <input type="text" name="first_name" class="glass-input" required placeholder="Votre prénom">
+                </div>
+                <div class="input-wrapper">
+                    <label>Nom</label>
+                    <input type="text" name="last_name" class="glass-input" required placeholder="Votre nom">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Adresse E-mail</label>
+                <input type="email" name="email" class="glass-input" required placeholder="exemple@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Numéro WhatsApp</label>
+                <input type="text" name="whatsapp" class="glass-input" required placeholder="Ex: +22... (Indicatif + Numéro)">
+            </div>
+
+            <h3 class="form-section-title" style="margin-top: 25px;">Club & Fonction</h3>
+
+            <div class="form-group row-group">
+                <div class="input-wrapper">
+                    <label>Pays</label>
+                    <select name="pays" class="glass-input" required>
+                        <option value="" disabled selected>Choisir un pays</option>
+                        <option value="Senegal">Sénégal</option>
+                        <option value="Mali">Mali</option>
+                        <option value="CoteIvoire">Côte d'Ivoire</option>
+                        <option value="BurkinaFaso">Burkina Faso</option>
+                        <option value="Autre">Autre...</option>
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <label>District</label>
+                    <input type="text" name="district" class="glass-input" value="9101" required>
+                </div>
+            </div>
+
+            <div class="form-group row-group">
+                <div class="input-wrapper">
+                    <label>Nom du Club</label>
+                    <input type="text" name="club" class="glass-input" required placeholder="Ex: Rotary Club Dakar">
+                </div>
+                <div class="input-wrapper">
+                    <label>Poste / Fonction</label>
+                    <input type="text" name="poste" class="glass-input" placeholder="Ex: Trésorier...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Type de participant</label>
+                <select name="type_participant" class="glass-input" required>
+                    <option value="participant" selected>Participant Standard</option>
+                    <option value="organisateur">Organisateur / Staff</option>
+                    <option value="invite">Invité Spécial</option>
+                </select>
+            </div>
+
+            <button type="submit" class="glass-btn pulse-btn" style="margin-top: 20px;">
+                Valider mon inscription ➔
+            </button>
+        </form>
+    </div>
+    
+    <div style="text-align: center; margin-top: 25px; margin-bottom: 20px;">
+        <a href="{% url 'core:home' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Annuler et revenir à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

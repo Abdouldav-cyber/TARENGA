@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teranga 2027{% endblock %}</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Professionnel -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <!-- PWA -->
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Minimaliste -->
+        <header class="glass-nav">
+            <div class="logo-box">
+                <span class="logo-text">TERANGA <span class="highlight">2027</span></span>
+            </div>
+            <div class="lang-selector" style="display: flex; gap: 15px; align-items: center;">
+                <select>
+                    <option value="fr">FR</option>
+                    <option value="en">EN</option>
+                    <option value="pt">PT</option>
+                </select>
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                    <a href="{% url 'core:custom_admin_dashboard' %}" class="login-btn"><i class="fa-solid fa-shield-halved"></i> Admin</a>
+                    {% else %}
+                    <a href="{% url 'core:dashboard' %}" class="login-btn"><i class="fa-solid fa-user"></i> Mon Espace</a>
+                    {% endif %}
+                {% else %}
+                <a href="{% url 'core:login' %}" class="login-btn"><i class="fa-solid fa-right-to-bracket"></i> Se connecter</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <style>
+            .login-btn {
+                background: #0f172a;
+                color: #fff;
+                padding: 6px 14px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 0.85rem;
+                transition: background 0.2s;
+            }
+            .login-btn:hover {
+                background: #3b82f6;
+            }
+        </style>
+
+        <!-- Contenu Dynamique -->
+        <main class="page-content">
+            {% block content %}
+            {% endblock %}
+        </main>
+        
+        <!-- Pied de page -->
+        <footer class="app-footer">
+            <p>&copy; 2027 Rotary & Rotaract District 9101</p>
+        </footer>
+    </div>
+</body>
+</html>

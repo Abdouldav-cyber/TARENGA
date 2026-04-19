@@ -1,0 +1,6 @@
+Django>=5.0,<5.1
+psycopg2-binary>=2.9,<3.0
+python-dotenv>=1.0.1
+django-pwa>=1.1.0 # Pour rendre le site Django installable comme une application mobile
+Pillow>=10.2.0
+qrcode>=7.4.2

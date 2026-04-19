@@ -1,0 +1,30 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Tableau de Bord Global</h1>
+        <p style="color: #64748b; margin-top: 5px;">Vue d'ensemble en temps réel de votre événement.</p>
+    </div>
+</div>
+
+<div class="grid-stats">
+    <div class="stat-card">
+        <h3>Total Participants</h3>
+        <span class="value" style="color: var(--primary);">{{ total_participants }}</span>
+        <div style="margin-top: 15px; font-size: 0.85rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            <span style="font-weight: 600; color: #f59e0b;">{{ total_rotary }}</span> Rotary | <span style="font-weight: 600; color: #ec4899;">{{ total_rotaract }}</span> Rotaract
+        </div>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid var(--success);">
+        <h3>Chiffre d'affaire (Payé)</h3>
+        <span class="value" style="color: var(--success);">{{ chiffre_affaire|floatformat:"0" }} <span style="font-size: 1rem;">FCFA</span></span>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;">Fonds sécurisés</p>
+    </div>
+    <div class="stat-card" style="border-left: 4px solid var(--danger);">
+        <h3>Reste à recouvrer</h3>
+        <span class="value" style="color: var(--danger);">{{ en_attente|floatformat:"0" }} <span style="font-size: 1rem;">FCFA</span></span>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;">En attente de paiement Wave/OM</p>
+    </div>
+</div>
+{% endblock %}

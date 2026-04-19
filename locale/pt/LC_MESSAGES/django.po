@@ -1,0 +1,87 @@
+# Translations for Portuguese.
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Mon Tableau de Bord - Teranga 2027"
+msgstr "Meu Painel - Teranga 2027"
+
+msgid "Caisse & Paiements"
+msgstr "Caixa e Pagamentos"
+
+msgid "Mon E-Billet"
+msgstr "Meu E-Ticket"
+
+msgid "Ma Logistique"
+msgstr "Minha Logística"
+
+msgid "Déconnexion"
+msgstr "Sair"
+
+msgid "Bonjour,"
+msgstr "Olá,"
+
+msgid "Résumé Facturation"
+msgstr "Resumo de Faturamento"
+
+msgid "Total à régler"
+msgstr "Total a pagar"
+
+msgid "Montant déjà payé"
+msgstr "Valor já pago"
+
+msgid "Statut Actuel"
+msgstr "Status Atual"
+
+msgid "Payé et Complet"
+msgstr "Pago e Completo"
+
+msgid "Paiement Partiel"
+msgstr "Pagamento Parcial"
+
+msgid "Non Payé"
+msgstr "Não Pago"
+
+msgid "Finalisez votre règlement via nos passerelles sécurisées :"
+msgstr "Finalize seu pagamento através de nossos portais seguros:"
+
+msgid "Votre E-Billet Personnel"
+msgstr "O Seu E-Ticket Pessoal"
+
+msgid "Ce QR Code crypté est votre sésame d'entrée pour l'événement. Présentez-le aux points de contrôle."
+msgstr "Este Código QR criptografado é o seu passe de entrada para o evento. Apresente-o nos pontos de controle."
+
+msgid "BILLET VALIDÉ"
+msgstr "BILHETE VALIDADO"
+
+msgid "Prêt pour Teranga 2027"
+msgstr "Pronto para Teranga 2027"
+
+msgid "Le code source sera généré ici"
+msgstr "O código do bilhete será gerado aqui"
+
+msgid "Vos Informations de Séjour"
+msgstr "Suas Informações de Estadia"
+
+msgid "Arrivée à Dakar (AIBD)"
+msgstr "Chegada em Dakar (AIBD)"
+
+msgid "Hébergement attribué"
+msgstr "Acomodação Atribuída"
+
+msgid "Chambre Vol."
+msgstr "Quarto N°"
+
+msgid "Transport Interne"
+msgstr "Transporte Interno"
+
+msgid "Français"
+msgstr "Francês"
+
+msgid "English"
+msgstr "Inglês"
+
+msgid "Português"
+msgstr "Português"

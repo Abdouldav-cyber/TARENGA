@@ -1,0 +1,66 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Logistique & Hébergement</h1>
+        <p style="color: #64748b; margin-top: 5px;">Suivez les arrivées et gérez l'attribution des hôtels.</p>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Participant</th>
+            <th>Type de transport</th>
+            <th>Arrivée prévue</th>
+            <th>Hôtel attribué</th>
+            <th>N° Chambre</th>
+            <th>Billet & Statut</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for logistic in logistics_list %}
+        <tr>
+            <td>
+                <strong>{{ logistic.participant.first_name }} {{ logistic.participant.last_name }}</strong><br>
+                <span style="font-size: 0.8rem; color: #64748b;">{{ logistic.participant.club }}</span>
+            </td>
+            <td>{{ logistic.transport_mode|default:"<span style='color:#cbd5e1;'>Non spécifié</span>"|safe }}</td>
+            <td>{{ logistic.arrival_datetime|date:"d M Y, H:i"|default:"<span style='color:#cbd5e1;'>En attente</span>"|safe }}</td>
+            <td>
+                {% if logistic.hotel_name %}
+                    <span style="font-weight: 600; color: #1565c0;">{{ logistic.hotel_name }}</span>
+                {% else %}
+                    <span style="color: #f59e0b; font-weight: 600;">À attribuer</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if logistic.room_number %}
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">{{ logistic.room_number }}</span>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if logistic.participant.payments.first.status == 'paye' %}
+                    <span class="badge badge-success">Billet Débloqué</span>
+                {% else %}
+                    <span class="badge badge-danger">Bloqué (Impayé)</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'core:admin_logistics_assign' logistic.id %}" class="action-btn" style="background: var(--primary); color: white;">
+                    ✏️ Attribuer
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8;">Aucune donnée logistique pour l'instant.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
