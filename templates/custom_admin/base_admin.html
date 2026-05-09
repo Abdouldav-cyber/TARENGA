@@ -20,26 +20,66 @@
         body { display: flex; min-height: 100vh; background-color: var(--bg-body); color: #1e293b; }
         
         .sidebar {
-            width: 260px;
-            background: var(--bg-sidebar);
+            width: 280px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             color: white;
             display: flex;
             flex-direction: column;
-            padding: 20px 0;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            padding: 25px 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
         }
-        .sidebar-brand { font-size: 1.5rem; font-weight: 700; padding: 0 20px 30px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            padding: 0 25px 30px 25px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            margin-bottom: 15px; 
+            letter-spacing: -0.5px;
+        }
+        .sidebar-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+            padding: 15px 25px 5px 25px;
+        }
         .nav-item {
-            padding: 15px 25px;
-            color: var(--text-sidebar);
+            padding: 12px 25px;
+            color: #cbd5e1;
             text-decoration: none;
             font-weight: 500;
-            transition: 0.2s;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255,255,255,0.1);
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        .nav-item:hover i {
+            opacity: 1;
+            transform: scale(1.1);
+            color: var(--primary);
+        }
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(37,99,235,0.15) 0%, transparent 100%);
             color: white;
             border-left: 4px solid var(--primary);
+            font-weight: 600;
+        }
+        .nav-item.active i {
+            opacity: 1;
+            color: #3b82f6;
         }
         
         .main-content {
@@ -88,24 +128,94 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-brand"><i class="fa-solid fa-shield-halved" style="margin-right: 8px; color: var(--primary);"></i> Téranga Admin</div>
-        <a href="{% url 'core:custom_admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_dashboard' %}active{% endif %}"><i class="fa-solid fa-chart-pie" style="width: 25px;"></i> Vue d'ensemble</a>
-        <a href="{% url 'core:custom_admin_participants' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_participants' %}active{% endif %}"><i class="fa-solid fa-users" style="width: 25px;"></i> Participants & Paiements</a>
-        <a href="{% url 'core:custom_admin_logistics' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_logistics' %}active{% endif %}"><i class="fa-solid fa-hotel" style="width: 25px;"></i> Logistique & Hôtels</a>
-        <a href="{% url 'core:logout_view' %}" class="nav-item" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); color: #ef4444; font-weight: bold;"><i class="fa-solid fa-arrow-right-from-bracket" style="width: 25px;"></i> Se Déconnecter</a>
+        <div class="sidebar-brand"><i class="fa-solid fa-gem" style="margin-right: 10px; color: #3b82f6;"></i> Téranga Admin</div>
+        
+        <div class="sidebar-category">Tableau de bord</div>
+        <a href="{% url 'core:custom_admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_dashboard' %}active{% endif %}"><i class="fa-solid fa-chart-line"></i> Vue d'ensemble</a>
+        
+        <div class="sidebar-category">Gestion des Inscriptions</div>
+        <a href="{% url 'core:custom_admin_participants' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_participants' %}active{% endif %}"><i class="fa-solid fa-users-gear"></i> Participants</a>
+        <a href="{% url 'core:custom_admin_logistics' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_logistics' %}active{% endif %}"><i class="fa-solid fa-plane-arrival"></i> Logistique & Hôtels</a>
+        
+        <div class="sidebar-category">Finance & Collectes</div>
+        <a href="{% url 'core:custom_admin_taxes' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_taxes' %}active{% endif %}"><i class="fa-solid fa-file-invoice-dollar"></i> Taxes District</a>
+        <a href="{% url 'core:custom_admin_dons' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_dons' %}active{% endif %}"><i class="fa-solid fa-hand-holding-heart"></i> Gestion des Dons</a>
+        
+        <div class="sidebar-category">Contenu & Animation</div>
+        <a href="{% url 'core:custom_admin_clubs' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_clubs' %}active{% endif %}"><i class="fa-solid fa-building-columns"></i> Répertoire Clubs</a>
+        <a href="{% url 'core:custom_admin_posts' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_posts' %}active{% endif %}"><i class="fa-solid fa-hashtag"></i> Brand Center</a>
+        <a href="{% url 'core:custom_admin_packs' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_packs' %}active{% endif %}"><i class="fa-solid fa-boxes-packing"></i> Packs & Activités</a>
+        <a href="{% url 'core:custom_admin_programme' %}" class="nav-item {% if request.resolver_match.url_name == 'custom_admin_programme' %}active{% endif %}"><i class="fa-solid fa-calendar-days"></i> Programme</a>
+
+        <a href="{% url 'core:logout_view' %}" class="nav-item" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); color: #ef4444; font-weight: 600;"><i class="fa-solid fa-power-off"></i> Se Déconnecter</a>
     </div>
     
     <div class="main-content">
-        {% if messages %}
-            {% for message in messages %}
-                <div style="background: #d1fae5; color: #047857; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        
         {% block admin_content %}
         {% endblock %}
     </div>
+
+    <!-- SweetAlert2 pour de magnifiques notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Remplacer les alertes "confirm()" par des modals SweetAlert2 design
+            document.querySelectorAll('a[onclick*="confirm"]').forEach(function(el) {
+                // Extraire le message du texte onclick original
+                var msgMatch = el.getAttribute('onclick').match(/confirm\(['"](.*?)['"]\)/);
+                var msg = msgMatch ? msgMatch[1] : "Êtes-vous sûr de vouloir effectuer cette action ?";
+                
+                // Retirer l'attribut natif pour bloquer le popup moche du navigateur
+                el.removeAttribute('onclick');
+                
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var href = this.getAttribute('href');
+                    
+                    Swal.fire({
+                        title: 'Confirmation requise',
+                        text: msg,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#1565c0',
+                        cancelButtonColor: '#f1f5f9',
+                        confirmButtonText: 'Oui, continuer',
+                        cancelButtonText: '<span style="color: #475569;">Annuler</span>',
+                        customClass: {
+                            confirmButton: 'action-btn',
+                            cancelButton: 'action-btn'
+                        },
+                        borderRadius: '12px'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = href;
+                        }
+                    });
+                });
+            });
+
+            // 2. Gérer les messages Flash Django (Success/Error) avec SweetAlert Toasts
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            {% if messages %}
+                {% for message in messages %}
+                    Toast.fire({
+                        icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+                        title: '{{ message|escapejs }}'
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 </html>

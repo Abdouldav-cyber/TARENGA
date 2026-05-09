@@ -17,8 +17,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
     
     <!-- PWA -->
-    {% load pwa %}
-    {% progressive_web_app_meta %}
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a0b">
+    <link rel="apple-touch-icon" href="/static/images/icon-192x192.png">
 </head>
 <body>
     <div class="app-container">
@@ -28,12 +29,28 @@
                 <span class="logo-text">TERANGA <span class="highlight">2027</span></span>
             </div>
             <div class="lang-selector" style="display: flex; gap: 15px; align-items: center;">
+                <div style="margin-right: 15px;">
+                    <a href="{% url 'core:make_donation' %}" style="text-decoration: none; color: #fff; background: #F7A81B; padding: 8px 15px; border-radius: 6px; font-weight: bold;"><i class="fa-solid fa-heart"></i> Faire un Don</a>
+                </div>
+                <div style="margin-right: 20px;">
+                    <a href="{% url 'core:programme' %}" style="text-decoration: none; color: #17458F; font-weight: bold;"><i class="fa-solid fa-calendar-days"></i> Programme</a>
+                </div>
+                <div style="margin-right: 20px;">
+                    <a href="{% url 'core:brand_center' %}" style="text-decoration: none; color: #17458F; font-weight: bold;"><i class="fa-solid fa-users"></i> Brand Center</a>
+                </div>
                 <select>
                     <option value="fr">FR</option>
                     <option value="en">EN</option>
                     <option value="pt">PT</option>
                 </select>
                 {% if user.is_authenticated %}
+                    <a href="{% url 'core:notifications' %}" style="text-decoration: none; color: #1e293b; font-size: 1.2rem; position: relative; margin-right: 15px;">
+                        <i class="fa-solid fa-bell"></i>
+                        {% if user.notifications.count > 0 %}
+                            <span style="position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: bold;">{{ user.notifications.count }}</span>
+                        {% endif %}
+                    </a>
+                    
                     {% if user.is_staff %}
                     <a href="{% url 'core:custom_admin_dashboard' %}" class="login-btn"><i class="fa-solid fa-shield-halved"></i> Admin</a>
                     {% else %}
@@ -72,5 +89,32 @@
             <p>&copy; 2027 Rotary & Rotaract District 9101</p>
         </footer>
     </div>
+
+    <!-- SweetAlert2 pour le Frontend -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            {% if messages %}
+                {% for message in messages %}
+                    Toast.fire({
+                        icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+                        title: '{{ message|escapejs }}'
+                    });
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
 </body>
 </html>

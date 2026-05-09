@@ -1,0 +1,63 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Gestion des Dons</h1>
+        <p style="color: #64748b; margin-top: 5px;">Suivez les contributions de la communauté.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'core:export_dons' %}" class="action-btn" style="background: white; border: 1px solid #e2e8f0; color: #475569; font-size: 1rem;"><i class="fa-solid fa-file-csv"></i> Exporter CSV</a>
+        <a href="/admin/core/donation/" target="_blank" class="action-btn" style="background: #0f172a; color: white; font-size: 1rem;"><i class="fa-solid fa-gear"></i> Gérer les Dons</a>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Donateur / Anonyme</th>
+            <th>Bénéficiaire</th>
+            <th>Montant</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for don in page_obj %}
+        <tr>
+            <td style="color: #64748b; font-size: 0.9rem;">{{ don.created_at|date:"d M Y H:i" }}</td>
+            <td>
+                {% if don.is_anonymous %}
+                    <span style="color: #94a3b8; font-style: italic;"><i class="fa-solid fa-user-secret"></i> Anonyme</span>
+                {% else %}
+                    <strong>{{ don.donateur_user.first_name|default:"Visiteur" }} {{ don.donateur_user.last_name|default:"" }}</strong>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge" style="background: #f1f5f9; color: #475569;">{{ don.get_beneficiary_type_display }}</span><br>
+                <span style="font-size: 0.85rem; color: #64748b;">
+                    {% if don.beneficiary_type == 'club' %}{{ don.beneficiary_club.name }}
+                    {% elif don.beneficiary_type == 'personne' or don.beneficiary_type == 'organisation' %}{{ don.beneficiary_name }}
+                    {% else %}Lui-même{% endif %}
+                </span>
+            </td>
+            <td><strong>{{ don.amount|floatformat:"0" }} FCFA</strong></td>
+            <td>
+                {% if don.status == 'paye' %}
+                    <span class="badge badge-success">Validé</span>
+                {% elif don.status == 'echoue' %}
+                    <span class="badge badge-danger">Échoué</span>
+                {% else %}
+                    <span class="badge" style="background: #fef3c7; color: #d97706;">En attente</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">Aucun don enregistré pour le moment.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
+{% endblock %}

@@ -3,6 +3,59 @@
 {% block title %}Inscription - Teranga 2027{% endblock %}
 
 {% block content %}
+<style>
+    .pack-cards-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+    .pack-card {
+        flex: 1;
+        min-width: 200px;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .pack-card:hover {
+        border-color: var(--color-primary);
+        box-shadow: 0 4px 15px rgba(21, 101, 192, 0.1);
+        transform: translateY(-2px);
+    }
+    .pack-card-vip {
+        border: 2px solid #fbbf24;
+        background: linear-gradient(145deg, #ffffff, #fffbeb);
+    }
+    .pack-card-vip .pack-title {
+        color: #d97706;
+    }
+    .pack-card-vip:hover {
+        border-color: #f59e0b;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+    }
+    .pack-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 5px;
+    }
+    .pack-price {
+        font-size: 1.2rem;
+        color: var(--color-primary);
+        font-weight: 900;
+        margin-bottom: 10px;
+    }
+    .pack-desc {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.4;
+    }
+</style>
 <div class="hero-section fade-in-up" style="margin-top: 10px;">
     <h1 style="font-size: 1.8rem;">Inscription <span class="highlight-gradient">{{ event_type|title }}</span></h1>
     <p class="subtitle" style="margin-bottom: 20px; font-size: 0.9rem;">
@@ -11,14 +64,14 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="glass-card" style="border-color: #4CAF50; color: #4CAF50; margin-bottom: 20px; padding: 15px;">
+            <div class="glass-card" style="border-color: {% if message.tags == 'error' %}#ef4444{% else %}#4CAF50{% endif %}; color: {% if message.tags == 'error' %}#ef4444{% else %}#4CAF50{% endif %}; margin-bottom: 20px; padding: 15px;">
                 {{ message }}
             </div>
         {% endfor %}
     {% endif %}
 
     <div class="glass-card form-card">
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
             {% csrf_token %}
             
             <h3 class="form-section-title">Informations Personnelles</h3>
@@ -26,22 +79,44 @@
             <div class="form-group row-group">
                 <div class="input-wrapper">
                     <label>Prénom</label>
-                    <input type="text" name="first_name" class="glass-input" required placeholder="Votre prénom">
+                    <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" class="glass-input" required placeholder="Votre prénom">
                 </div>
                 <div class="input-wrapper">
                     <label>Nom</label>
-                    <input type="text" name="last_name" class="glass-input" required placeholder="Votre nom">
+                    <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" class="glass-input" required placeholder="Votre nom">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Adresse E-mail</label>
-                <input type="email" name="email" class="glass-input" required placeholder="exemple@email.com">
+                <input type="email" name="email" id="email" value="{{ form.email.value|default:'' }}" class="glass-input" required placeholder="exemple@email.com">
+            </div>
+
+            <div class="form-group row-group">
+                <div class="input-wrapper">
+                    <label>Numéro de Téléphone</label>
+                    <input type="text" name="telephone" id="telephone" value="{{ form.telephone.value|default:'' }}" class="glass-input" required placeholder="Ex: +22...">
+                </div>
+                <div class="input-wrapper">
+                    <label>Numéro WhatsApp</label>
+                    <input type="text" name="whatsapp" id="whatsapp" value="{{ form.whatsapp.value|default:'' }}" class="glass-input" required placeholder="Ex: +22...">
+                </div>
+            </div>
+            
+            <div id="check-alert-container" style="display:none; margin-bottom: 15px;"></div>
+
+            <div class="form-group">
+                <label>Créer un Mot de passe</label>
+                <input type="password" name="password" id="password" class="glass-input" {% if not request.user.is_authenticated %}required{% endif %} placeholder="Votre mot de passe pour accéder à votre espace">
+                {% if request.user.is_authenticated %}
+                <small style="color: var(--text-muted); font-size: 0.8rem;">Laissez vide si vous ne souhaitez pas modifier votre mot de passe actuel.</small>
+                {% endif %}
             </div>
 
             <div class="form-group">
-                <label>Numéro WhatsApp</label>
-                <input type="text" name="whatsapp" class="glass-input" required placeholder="Ex: +22... (Indicatif + Numéro)">
+                <label>Photo de Profil</label>
+                <input type="file" name="photo" class="glass-input" accept="image/*">
+                <small style="color: var(--text-muted); font-size: 0.8rem;">(Optionnel) Utilisée pour la génération de votre badge.</small>
             </div>
 
             <h3 class="form-section-title" style="margin-top: 25px;">Club & Fonction</h3>
@@ -49,42 +124,97 @@
             <div class="form-group row-group">
                 <div class="input-wrapper">
                     <label>Pays</label>
-                    <select name="pays" class="glass-input" required>
-                        <option value="" disabled selected>Choisir un pays</option>
-                        <option value="Senegal">Sénégal</option>
-                        <option value="Mali">Mali</option>
-                        <option value="CoteIvoire">Côte d'Ivoire</option>
-                        <option value="BurkinaFaso">Burkina Faso</option>
-                        <option value="Autre">Autre...</option>
+                    <select name="pays" id="pays" class="glass-input" required>
+                        <option value="" disabled {% if not form.pays.value %}selected{% endif %}>Choisir un pays</option>
+                        <option value="Senegal" {% if form.pays.value == 'Senegal' %}selected{% endif %}>Sénégal</option>
+                        <option value="Mali" {% if form.pays.value == 'Mali' %}selected{% endif %}>Mali</option>
+                        <option value="CoteIvoire" {% if form.pays.value == 'CoteIvoire' %}selected{% endif %}>Côte d'Ivoire</option>
+                        <option value="BurkinaFaso" {% if form.pays.value == 'BurkinaFaso' %}selected{% endif %}>Burkina Faso</option>
+                        <option value="Autre" {% if form.pays.value == 'Autre' %}selected{% endif %}>Autre...</option>
                     </select>
                 </div>
                 <div class="input-wrapper">
                     <label>District</label>
-                    <input type="text" name="district" class="glass-input" value="9101" required>
+                    <input type="text" name="district" id="district" class="glass-input" value="{{ form.district.value|default:'9101' }}" required>
                 </div>
             </div>
 
             <div class="form-group row-group">
                 <div class="input-wrapper">
                     <label>Nom du Club</label>
-                    <input type="text" name="club" class="glass-input" required placeholder="Ex: Rotary Club Dakar">
+                    <select name="club" id="club" class="glass-input" required>
+                        <option value="" disabled {% if not form.club.value %}selected{% endif %}>-- Choisissez d'abord un pays --</option>
+                        {% for c in clubs %}
+                        <option value="{{ c.id }}" {% if form.club.value|stringformat:"s" == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }} ({{ c.country }})</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="input-wrapper">
                     <label>Poste / Fonction</label>
-                    <input type="text" name="poste" class="glass-input" placeholder="Ex: Trésorier...">
+                    <input type="text" name="poste" value="{{ form.poste.value|default:'' }}" class="glass-input" placeholder="Ex: Trésorier...">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Type de participant</label>
                 <select name="type_participant" class="glass-input" required>
-                    <option value="participant" selected>Participant Standard</option>
-                    <option value="organisateur">Organisateur / Staff</option>
-                    <option value="invite">Invité Spécial</option>
+                    <option value="participant" {% if form.type_participant.value == 'participant' or not form.type_participant.value %}selected{% endif %}>Participant Standard</option>
+                    <option value="organisateur" {% if form.type_participant.value == 'organisateur' %}selected{% endif %}>Organisateur / Staff</option>
+                    <option value="invite" {% if form.type_participant.value == 'invite' %}selected{% endif %}>Invité Spécial</option>
+                    <option value="sponsor" {% if form.type_participant.value == 'sponsor' %}selected{% endif %}>Sponsor</option>
                 </select>
             </div>
 
-            <button type="submit" class="glass-btn pulse-btn" style="margin-top: 20px;">
+            <h3 class="form-section-title" style="margin-top: 25px;">Options & Logistique</h3>
+            
+            {% if packs %}
+            <div style="margin-bottom: 15px;">
+                <p style="font-size: 0.9rem; color: #475569; margin-bottom: 10px; font-weight: 600;">Découvrez nos packs d'accréditation :</p>
+                <div class="pack-cards-container">
+                    {% for pack in packs %}
+                    <div class="pack-card {% if 'VIP' in pack.name %}pack-card-vip{% endif %}">
+                        <div class="pack-title">{% if 'VIP' in pack.name %}<i class="fa-solid fa-crown" style="color:#fbbf24; margin-right:5px;"></i>{% endif %}{{ pack.name }}</div>
+                        <div class="pack-price">{{ pack.price_fcfa }} FCFA</div>
+                        <div class="pack-desc" style="text-align: left;">{{ pack.description|default:"-" }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label>Hôtel de Préférence (Optionnel)</label>
+                <input type="text" name="hotel_name" class="glass-input" placeholder="Si vous avez une préférence pour votre hébergement...">
+            </div>
+            
+            <div class="form-group row-group">
+                <div class="input-wrapper">
+                    <label>Choix du Pack</label>
+                    <select name="pack" class="glass-input">
+                        <option value="">Sélectionnez un pack (Optionnel)</option>
+                        {% for pack in packs %}
+                        <option value="{{ pack.id }}">{{ pack.name }} - {{ pack.price_fcfa }} FCFA</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-wrapper">
+                    <label>Mode de Paiement</label>
+                    <select name="payment_plan" class="glass-input" id="payment_plan_select">
+                        <option value="comptant" selected>Paiement Comptant (1x)</option>
+                        <option value="tontine">Paiement par Tontine (Échelonné)</option>
+                    </select>
+                    <div id="tontine-warning" style="display: none; background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 10px; border: 1px solid #f87171;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <strong>Attention :</strong> Le paiement par tontine doit être intégralement soldé au plus tard <strong>1 mois avant le début de l'événement</strong> sous peine d'annulation.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" name="is_procuration" id="is_procuration" style="width: 20px; height: 20px; accent-color: var(--color-primary);">
+                <label for="is_procuration" style="margin: 0; font-weight: 600; color: #0f172a; cursor: pointer;">Ceci est une inscription par procuration</label>
+            </div>
+
+            <button type="submit" class="glass-btn pulse-btn" style="margin-top: 20px; width: 100%;">
                 Valider mon inscription ➔
             </button>
         </form>
@@ -94,4 +224,118 @@
         <a href="{% url 'core:home' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Annuler et revenir à l'accueil</a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentSelect = document.getElementById('payment_plan_select');
+        const tontineWarning = document.getElementById('tontine-warning');
+
+        if (paymentSelect && tontineWarning) {
+            paymentSelect.addEventListener('change', function() {
+                if (this.value === 'tontine') {
+                    tontineWarning.style.display = 'block';
+                } else {
+                    tontineWarning.style.display = 'none';
+                }
+            });
+        }
+
+        // Transformer les descriptions de pack en liste à puces
+        document.querySelectorAll('.pack-desc').forEach(function(el) {
+            let desc = el.textContent.trim();
+            if(desc && desc !== "-") {
+                let parts = desc.split('-');
+                let html = '<ul style="list-style:none; padding:0; margin:0;">';
+                parts.forEach(function(part) {
+                    if(part.trim()) {
+                        html += '<li style="margin-bottom:8px; display:flex; align-items:flex-start; gap:8px;">' +
+                                '<i class="fa-solid fa-circle-check" style="color:#10b981; margin-top:3px;"></i>' + 
+                                '<span>' + part.trim() + '</span></li>';
+                    }
+                });
+                html += '</ul>';
+                el.innerHTML = html;
+            }
+        });
+
+        // 1. AJAX Validation pour l'Email
+        const emailInput = document.getElementById('email');
+        const alertContainer = document.getElementById('check-alert-container');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        function checkIdentifier(value) {
+            if (!value) {
+                alertContainer.style.display = 'none';
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            fetch(`/api/check_participant/?identifier=${encodeURIComponent(value)}&event={{ event_type }}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        alertContainer.style.display = 'block';
+                        alertContainer.innerHTML = `<div style="padding: 10px; border-radius: 8px; font-size: 0.9rem; ${data.registered_for_event ? 'background-color: #fef2f2; border: 1px solid #ef4444; color: #b91c1c;' : 'background-color: #eff6ff; border: 1px solid #3b82f6; color: #1d4ed8;'}">
+                            ${data.registered_for_event ? '<i class="fa-solid fa-triangle-exclamation"></i> ' : '<i class="fa-solid fa-circle-info"></i> '} ${data.message}
+                            ${!data.registered_for_event ? ' <a href="/login/" style="color: #1d4ed8; text-decoration: underline; font-weight: bold;">Se connecter</a>' : ''}
+                        </div>`;
+                        if (data.registered_for_event) {
+                            submitBtn.disabled = true;
+                            submitBtn.style.opacity = '0.5';
+                            submitBtn.style.cursor = 'not-allowed';
+                        }
+                    } else {
+                        alertContainer.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+                    }
+                });
+        }
+
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() { checkIdentifier(this.value); });
+        }
+
+        // 2. Cascade Country -> District -> Clubs
+        const paysSelect = document.getElementById('pays');
+        const districtInput = document.getElementById('district');
+        const clubSelect = document.getElementById('club');
+
+        function fetchClubs() {
+            const pays = paysSelect.value;
+            const district = districtInput.value;
+            
+            if (pays) {
+                clubSelect.innerHTML = '<option value="" disabled selected>Chargement...</option>';
+                fetch(`/api/get_clubs/?pays=${encodeURIComponent(pays)}&district=${encodeURIComponent(district)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        clubSelect.innerHTML = '<option value="" disabled selected>-- Choisir un club --</option>';
+                        if (data.clubs && data.clubs.length > 0) {
+                            data.clubs.forEach(club => {
+                                clubSelect.innerHTML += `<option value="${club.id}">${club.name} (${club.country})</option>`;
+                            });
+                        } else {
+                            clubSelect.innerHTML = '<option value="" disabled selected>Aucun club trouvé pour cette région</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        clubSelect.innerHTML = '<option value="" disabled selected>-- Erreur de chargement --</option>';
+                    });
+            }
+        }
+
+        if (paysSelect && districtInput && clubSelect) {
+            paysSelect.addEventListener('change', fetchClubs);
+            districtInput.addEventListener('blur', fetchClubs);
+            
+            // Initial fetch if pays is already selected
+            if (paysSelect.value && !clubSelect.value) {
+                fetchClubs();
+            }
+        }
+    });
+</script>
 {% endblock %}

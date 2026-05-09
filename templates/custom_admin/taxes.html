@@ -1,0 +1,43 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h2 style="color: #0f172a; font-size: 1.8rem; margin-bottom: 5px;">Taxes District</h2>
+        <p style="color: #64748b;">Suivi des paiements des taxes des clubs (Lecture seule)</p>
+    </div>
+    <a href="{% url 'core:export_taxes' %}" class="action-btn" style="background: white; border: 1px solid #e2e8f0; color: #475569; font-size: 1rem;"><i class="fa-solid fa-file-csv"></i> Exporter CSV</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Club</th>
+            <th>Mandat</th>
+            <th>Statut</th>
+            <th>Date de paiement</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in page_obj %}
+        <tr>
+            <td style="font-weight: 600;">{{ t.club.name }}</td>
+            <td>{{ t.mandat }}</td>
+            <td>
+                {% if t.status == 'paye' %}
+                    <span class="badge badge-success">Payé</span>
+                {% elif t.status == 'partiel' %}
+                    <span class="badge" style="background:#fef3c7; color:#d97706;">Partiel</span>
+                {% else %}
+                    <span class="badge badge-danger">Non Payé</span>
+                {% endif %}
+            </td>
+            <td>{{ t.payment_date|date:"d M Y"|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center;">Aucune taxe enregistrée.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
+{% endblock %}

@@ -1,0 +1,28 @@
+{% if page_obj.has_other_pages %}
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-top: 1px solid #e2e8f0; background: #f8fafc;">
+    <span style="color: #64748b; font-size: 0.9rem;">
+        Affichage de la page <strong>{{ page_obj.number }}</strong> sur <strong>{{ page_obj.paginator.num_pages }}</strong>
+    </span>
+    <div style="display: flex; gap: 5px;">
+        {% if page_obj.has_previous %}
+            <a href="?{% if query_params %}{{ query_params }}&{% endif %}{{ param_name|default:'page' }}={{ page_obj.previous_page_number }}" class="action-btn" style="background: white; border: 1px solid #cbd5e1; color: #475569;"><i class="fa-solid fa-chevron-left"></i></a>
+        {% else %}
+            <span class="action-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #94a3b8; cursor: not-allowed;"><i class="fa-solid fa-chevron-left"></i></span>
+        {% endif %}
+
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <span class="action-btn" style="background: var(--primary); border: 1px solid var(--primary); color: white;">{{ i }}</span>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                <a href="?{% if query_params %}{{ query_params }}&{% endif %}{{ param_name|default:'page' }}={{ i }}" class="action-btn" style="background: white; border: 1px solid #cbd5e1; color: #475569;">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?{% if query_params %}{{ query_params }}&{% endif %}{{ param_name|default:'page' }}={{ page_obj.next_page_number }}" class="action-btn" style="background: white; border: 1px solid #cbd5e1; color: #475569;"><i class="fa-solid fa-chevron-right"></i></a>
+        {% else %}
+            <span class="action-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #94a3b8; cursor: not-allowed;"><i class="fa-solid fa-chevron-right"></i></span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

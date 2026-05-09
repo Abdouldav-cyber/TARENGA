@@ -1,0 +1,71 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h2 style="color: #0f172a; font-size: 1.8rem; margin-bottom: 5px;">Programme Officiel</h2>
+        <p style="color: #64748b;">Vue d'ensemble de l'agenda de l'événement (Lecture seule)</p>
+    </div>
+    <!-- Lien vers l'admin Django natif si on veut éditer/ajouter -->
+    <a href="/admin/core/eventday/" class="action-btn" style="background: var(--primary); color: white; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-pen-to-square"></i> Modifier le programme
+    </a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 30px;">
+    {% for day in page_obj %}
+    <div style="background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden;">
+        <div style="background: #f8fafc; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;">
+            <div style="background: var(--primary); color: white; width: 50px; height: 50px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; line-height: 1.2;">
+                <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Jour</span>
+                <span style="font-size: 1.2rem; font-weight: 800;">{{ forloop.counter }}</span>
+            </div>
+            <div>
+                <h3 style="color: #0f172a; font-size: 1.2rem; margin: 0;">{{ day.title }}</h3>
+                <p style="color: #64748b; font-size: 0.9rem; margin: 0; font-weight: 500;">{{ day.date|date:"l d F Y" }}</p>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            {% if day.sessions.all %}
+                <table style="box-shadow: none; border: none; margin: 0;">
+                    <thead style="background: transparent;">
+                        <tr>
+                            <th style="padding-left: 0;">Horaire</th>
+                            <th>Session</th>
+                            <th>Lieu</th>
+                            <th>Intervenants</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in day.sessions.all %}
+                        <tr>
+                            <td style="padding-left: 0; font-weight: 600; color: var(--primary); white-space: nowrap;">
+                                {{ session.start_time|time:"H:i" }} - {{ session.end_time|time:"H:i" }}
+                            </td>
+                            <td style="font-weight: 600; color: #1e293b;">
+                                {{ session.title }}
+                                {% if session.description %}
+                                <p style="font-size: 0.8rem; color: #64748b; margin-top: 4px; font-weight: 400;">{{ session.description|truncatewords:15 }}</p>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i> {{ session.location|default:"-" }}</span></td>
+                            <td>{{ session.speakers|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #94a3b8; font-style: italic; margin: 0;">Aucune session planifiée pour cette journée.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 40px; background: white; border-radius: 12px; border: 1px dashed #cbd5e1;">
+        <i class="fa-solid fa-calendar-xmark" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+        <h3 style="color: #475569; margin-bottom: 5px;">Aucun programme défini</h3>
+        <p style="color: #94a3b8;">Le programme n'a pas encore été généré ou ajouté.</p>
+    </div>
+    {% endfor %}
+</div>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
+{% endblock %}

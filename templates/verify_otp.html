@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Vérification de l'E-mail | Teranga 2027{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; padding: 0 15px;">
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 10px;">Vérification de l'E-mail</h1>
+        <p class="subtitle" style="font-size: 0.9rem;">
+            Un code à 6 chiffres a été envoyé à <strong>{{ email }}</strong>. Veuillez le saisir ci-dessous pour activer votre compte.
+        </p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="glass-card" style="border-color: {% if message.tags == 'error' %}#ef4444{% else %}#4CAF50{% endif %}; color: {% if message.tags == 'error' %}#ef4444{% else %}#4CAF50{% endif %}; margin-bottom: 20px; padding: 15px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="glass-card form-card">
+        <form method="POST" action="">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label style="text-align: center; width: 100%; display: block; font-size: 1.1rem; margin-bottom: 15px;">Code de Vérification (OTP)</label>
+                <div style="display: flex; justify-content: center;">
+                    <input type="text" name="otp" class="glass-input" required placeholder="Ex: 123456" maxlength="6" style="font-size: 1.5rem; letter-spacing: 5px; text-align: center; font-weight: bold; width: 200px;">
+                </div>
+            </div>
+
+            <button type="submit" class="glass-btn pulse-btn" style="margin-top: 20px; width: 100%;">
+                Vérifier mon compte ➔
+            </button>
+        </form>
+    </div>
+    
+    <div style="text-align: center; margin-top: 25px; margin-bottom: 20px;">
+        <a href="{% url 'core:home' %}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">← Revenir à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

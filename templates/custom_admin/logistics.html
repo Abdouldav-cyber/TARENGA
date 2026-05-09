@@ -6,6 +6,7 @@
         <h1 style="font-size: 1.8rem; color: #0f172a;">Logistique & Hébergement</h1>
         <p style="color: #64748b; margin-top: 5px;">Suivez les arrivées et gérez l'attribution des hôtels.</p>
     </div>
+    <a href="{% url 'core:export_logistics' %}" class="action-btn" style="background: white; border: 1px solid #e2e8f0; color: #475569; font-size: 1rem;"><i class="fa-solid fa-file-csv"></i> Exporter CSV</a>
 </div>
 
 <table>
@@ -21,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for logistic in logistics_list %}
+        {% for logistic in page_obj %}
         <tr>
             <td>
                 <strong>{{ logistic.participant.first_name }} {{ logistic.participant.last_name }}</strong><br>
@@ -63,4 +64,5 @@
         {% endfor %}
     </tbody>
 </table>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
 {% endblock %}

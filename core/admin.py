@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Participant, Event, Payment, Logistics
+from .models import Participant, Event, Payment, Logistics, Club, Mandat, ClubTax, Donation, Post, Comment, EventPack, EventActivity, HomepageContent, EventDay, EventSession, Notification
 
 # Personnalisation de l'entête
 admin.site.site_header = "Administration Teranga 2027"
@@ -34,3 +34,74 @@ class PaymentAdmin(admin.ModelAdmin):
 class LogisticsAdmin(admin.ModelAdmin):
     list_display = ('participant', 'arrival_datetime', 'hotel_name', 'room_number')
     search_fields = ('participant__first_name', 'participant__last_name', 'hotel_name')
+
+
+@admin.register(Club)
+class ClubAdmin(admin.ModelAdmin):
+    list_display = ('name', 'club_type', 'country', 'city', 'is_active')
+    list_filter = ('club_type', 'country', 'is_active')
+    search_fields = ('name', 'city')
+
+
+@admin.register(Mandat)
+class MandatAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'start_year', 'end_year', 'is_active')
+    list_filter = ('is_active',)
+
+
+@admin.register(ClubTax)
+class ClubTaxAdmin(admin.ModelAdmin):
+    list_display = ('club', 'mandat', 'amount_expected', 'amount_paid', 'status', 'due_date')
+    list_filter = ('status', 'mandat')
+    search_fields = ('club__name',)
+
+@admin.register(Donation)
+class DonationAdmin(admin.ModelAdmin):
+    list_display = ('amount', 'status', 'beneficiary_type', 'donateur_user', 'created_at')
+    list_filter = ('status', 'beneficiary_type')
+    search_fields = ('donateur_user__username', 'beneficiary_name')
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('author', 'created_at', 'likes_count', 'comments_count')
+    search_fields = ('author__username', 'text')
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('author', 'post', 'created_at')
+    search_fields = ('author__username', 'text')
+
+@admin.register(EventPack)
+class EventPackAdmin(admin.ModelAdmin):
+    list_display = ('name', 'event', 'price_fcfa')
+    list_filter = ('event',)
+
+@admin.register(EventActivity)
+class EventActivityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'event', 'price_fcfa', 'is_daily')
+    list_filter = ('event', 'is_daily')
+
+@admin.register(HomepageContent)
+class HomepageContentAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'updated_at')
+
+    def has_add_permission(self, request):
+        if self.model.objects.count() >= 1:
+            return False
+        return super().has_add_permission(request)
+
+class EventSessionInline(admin.TabularInline):
+    model = EventSession
+    extra = 1
+
+@admin.register(EventDay)
+class EventDayAdmin(admin.ModelAdmin):
+    list_display = ('date', 'title', 'event')
+    list_filter = ('event',)
+    inlines = [EventSessionInline]
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('participant', 'title', 'type_notif', 'is_read', 'created_at')
+    list_filter = ('is_read', 'type_notif', 'created_at')
+    search_fields = ('participant__email', 'title', 'message')

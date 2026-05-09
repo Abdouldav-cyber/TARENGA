@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Brand Center - Teranga 2027{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h2><i class="fa-solid fa-users"></i> Brand Center</h2>
+    <p>Partagez vos moments forts avec la communauté Rotarienne.</p>
+
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+            <div style="background: #dcfce7; color: #166534; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px;">
+        <form method="POST" action="{% url 'core:create_post' %}">
+            {% csrf_token %}
+            <textarea name="text" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Que voulez-vous partager ?" required></textarea>
+            <button type="submit" style="margin-top: 10px; padding: 10px 20px; background: #17458F; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Publier</button>
+        </form>
+    </div>
+    {% else %}
+    <div style="background: #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+        <p>Connectez-vous pour publier, liker et commenter !</p>
+        <a href="{% url 'core:login' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #17458F; color: white; font-weight: bold; text-decoration: none; border-radius: 4px;">Se connecter</a>
+    </div>
+    {% endif %}
+
+    <div class="posts-feed">
+        {% for post in posts %}
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ccc; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    {{ post.author.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <strong>{{ post.author.first_name|default:post.author.username }}</strong>
+                    <div style="font-size: 0.8rem; color: #666;">{{ post.created_at|date:"d M Y H:i" }}</div>
+                </div>
+            </div>
+            <p style="font-size: 1.1rem; line-height: 1.5;">{{ post.text }}</p>
+            
+            <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 10px; display: flex; gap: 20px;">
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'core:like_post' post.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; cursor: pointer; color: #17458F; font-size: 1rem; padding: 0;">
+                        <i class="fa-solid fa-thumbs-up"></i> {{ post.likes_count }} J'aime
+                    </button>
+                </form>
+                {% else %}
+                <span style="color: #666;"><i class="fa-solid fa-thumbs-up"></i> {{ post.likes_count }} J'aime</span>
+                {% endif %}
+                <span style="color: #666;"><i class="fa-solid fa-comment"></i> {{ post.comments_count }} Commentaires</span>
+            </div>
+
+            <div style="margin-top: 15px; background: #f8fafc; padding: 15px; border-radius: 6px;">
+                {% for comment in post.comments.all %}
+                <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                    <strong>{{ comment.author.first_name|default:comment.author.username }}</strong> <span style="font-size: 0.8rem; color: #666; margin-left: 10px;">{{ comment.created_at|date:"d M Y H:i" }}</span>
+                    <p style="margin: 5px 0 0 0; font-size: 0.95rem;">{{ comment.text }}</p>
+                </div>
+                {% empty %}
+                <p style="color: #666; font-size: 0.9rem;">Aucun commentaire pour l'instant.</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'core:add_comment' post.id %}" style="margin-top: 10px; display: flex; gap: 10px;">
+                    {% csrf_token %}
+                    <input type="text" name="text" placeholder="Écrire un commentaire..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+                    <button type="submit" style="padding: 8px 15px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; font-weight: bold;">Envoyer</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 40px; color: #666; background: white; border-radius: 8px;">
+            <i class="fa-solid fa-comments" style="font-size: 3rem; margin-bottom: 15px; color: #cbd5e1;"></i>
+            <br>
+            Aucune publication pour le moment. Soyez le premier à partager !
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

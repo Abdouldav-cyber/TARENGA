@@ -5,15 +5,15 @@ class ParticipantRegistrationForm(forms.ModelForm):
     class Meta:
         model = Participant
         fields = [
-            'first_name', 'last_name', 'email', 'whatsapp', 
-            'district', 'pays', 'club', 'poste', 'type_participant'
+            'first_name', 'last_name', 'email', 'telephone', 'whatsapp', 
+            'district', 'pays', 'club', 'poste', 'type_participant', 'photo'
         ]
 
 class ParticipantEditForm(forms.ModelForm):
     class Meta:
         model = Participant
-        fields = ['first_name', 'last_name', 'email', 'whatsapp', 'pays', 'district', 'club', 'poste', 'type_participant']
-        widgets = { field: forms.TextInput(attrs={'class': 'glass-input'}) for field in ['first_name', 'last_name', 'whatsapp', 'pays', 'district', 'club', 'poste'] }
+        fields = ['first_name', 'last_name', 'email', 'telephone', 'whatsapp', 'pays', 'district', 'club', 'poste', 'type_participant', 'photo']
+        widgets = { field: forms.TextInput(attrs={'class': 'glass-input'}) for field in ['first_name', 'last_name', 'telephone', 'whatsapp', 'pays', 'district', 'club', 'poste'] }
         widgets['email'] = forms.EmailInput(attrs={'class': 'glass-input'})
         widgets['type_participant'] = forms.Select(attrs={'class': 'glass-input'})
 

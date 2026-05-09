@@ -1,0 +1,40 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h2 style="color: #0f172a; font-size: 1.8rem; margin-bottom: 5px;">Brand Center</h2>
+        <p style="color: #64748b;">Suivi des publications (Lecture seule)</p>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Auteur</th>
+            <th>Contenu</th>
+            <th>Date</th>
+            <th>Likes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in page_obj %}
+        <tr>
+            <td style="font-weight: 600;">
+                {% if p.author.first_name or p.author.last_name %}
+                    {{ p.author.first_name }} {{ p.author.last_name }}
+                {% else %}
+                    {{ p.author.email }}
+                {% endif %}
+            </td>
+            <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.text }}</td>
+            <td>{{ p.created_at|date:"d M Y H:i" }}</td>
+            <td><span class="badge" style="background: #e2e8f0;">{{ p.likes.count }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" style="text-align:center;">Aucune publication.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
+{% endblock %}

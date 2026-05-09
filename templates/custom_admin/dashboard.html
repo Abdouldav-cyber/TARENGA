@@ -8,23 +8,142 @@
     </div>
 </div>
 
-<div class="grid-stats">
-    <div class="stat-card">
+<div class="grid-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px;">
+    <div class="stat-card" style="border-left: 4px solid var(--primary);">
         <h3>Total Participants</h3>
         <span class="value" style="color: var(--primary);">{{ total_participants }}</span>
-        <div style="margin-top: 15px; font-size: 0.85rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            <span style="font-weight: 600; color: #f59e0b;">{{ total_rotary }}</span> Rotary | <span style="font-weight: 600; color: #ec4899;">{{ total_rotaract }}</span> Rotaract
+        <div style="margin-top: 15px; font-size: 0.85rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 10px; display: flex; justify-content: space-between;">
+            <span><i class="fa-solid fa-gear" style="color: #f59e0b;"></i> <span style="font-weight: 600;">{{ total_rotary }}</span> Rotary</span>
+            <span><i class="fa-solid fa-handshake" style="color: #ec4899;"></i> <span style="font-weight: 600;">{{ total_rotaract }}</span> Rotaract</span>
         </div>
     </div>
+    
     <div class="stat-card" style="border-left: 4px solid var(--success);">
         <h3>Chiffre d'affaire (Payé)</h3>
         <span class="value" style="color: var(--success);">{{ chiffre_affaire|floatformat:"0" }} <span style="font-size: 1rem;">FCFA</span></span>
-        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;">Fonds sécurisés</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;"><i class="fa-solid fa-check-circle" style="color: var(--success);"></i> Fonds sécurisés</p>
     </div>
+    
     <div class="stat-card" style="border-left: 4px solid var(--danger);">
         <h3>Reste à recouvrer</h3>
         <span class="value" style="color: var(--danger);">{{ en_attente|floatformat:"0" }} <span style="font-size: 1rem;">FCFA</span></span>
-        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;">En attente de paiement Wave/OM</p>
+        <p style="margin-top: 10px; font-size: 0.8rem; color: #64748b;"><i class="fa-solid fa-clock" style="color: var(--danger);"></i> En attente Wave/OM</p>
     </div>
 </div>
+
+<div class="grid-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 40px;">
+    <div class="stat-card" style="border-left: 4px solid #8b5cf6; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h3>Total Dons Récoltés</h3>
+            <p style="margin-bottom: 5px; font-size: 0.8rem; color: #64748b;">Dons validés et traités</p>
+            <span class="value" style="color: #8b5cf6;">{{ total_dons|floatformat:"0"|default:"0" }} <span style="font-size: 1rem;">FCFA</span></span>
+        </div>
+        <i class="fa-solid fa-hand-holding-heart" style="font-size: 3rem; color: rgba(139, 92, 246, 0.2);"></i>
+    </div>
+    
+    <div class="stat-card" style="border-left: 4px solid #0ea5e9; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h3>Brand Center</h3>
+            <p style="margin-bottom: 5px; font-size: 0.8rem; color: #64748b;">Posts publiés par la communauté</p>
+            <span class="value" style="color: #0ea5e9;">{{ total_posts }} <span style="font-size: 1rem;">Publications</span></span>
+        </div>
+        <i class="fa-solid fa-hashtag" style="font-size: 3rem; color: rgba(14, 165, 233, 0.2);"></i>
+    </div>
+</div>
+
+<!-- Section Graphiques -->
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+    
+    <!-- Graphique Répartition -->
+    <div class="stat-card" style="display: flex; flex-direction: column; min-height: 400px;">
+        <h3 style="margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;"><i class="fa-solid fa-chart-pie" style="color: var(--primary); margin-right: 8px;"></i> Répartition des Inscriptions</h3>
+        <div style="position: relative; flex: 1; width: 100%; display: flex; justify-content: center; align-items: center;">
+            <canvas id="participantsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Graphique Finances -->
+    <div class="stat-card" style="display: flex; flex-direction: column; min-height: 400px;">
+        <h3 style="margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;"><i class="fa-solid fa-chart-bar" style="color: var(--success); margin-right: 8px;"></i> Bilan Financier (FCFA)</h3>
+        <div style="position: relative; flex: 1; width: 100%;">
+            <canvas id="financeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Graphique des Participants (Doughnut)
+    const ctxParts = document.getElementById('participantsChart').getContext('2d');
+    new Chart(ctxParts, {
+        type: 'doughnut',
+        data: {
+            labels: ['Rotary', 'Rotaract'],
+            datasets: [{
+                data: [{{ total_rotary|default:"0" }}, {{ total_rotaract|default:"0" }}],
+                backgroundColor: [
+                    '#f59e0b', // Amber for Rotary
+                    '#ec4899'  // Pink for Rotaract
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20, font: { family: 'Outfit', size: 14 } }
+                }
+            }
+        }
+    });
+
+    // 2. Graphique Financier (Bar)
+    const ctxFin = document.getElementById('financeChart').getContext('2d');
+    new Chart(ctxFin, {
+        type: 'bar',
+        data: {
+            labels: ['CA (Payé)', 'Reste à recouvrer', 'Dons Récoltés'],
+            datasets: [{
+                label: 'Montant (FCFA)',
+                data: [
+                    {{ chiffre_affaire|default:"0" }}, 
+                    {{ en_attente|default:"0" }}, 
+                    {{ total_dons|default:"0" }}
+                ],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.8)', // Success green
+                    'rgba(239, 68, 68, 0.8)',  // Danger red
+                    'rgba(139, 92, 246, 0.8)'  // Purple
+                ],
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1f5f9' },
+                    ticks: { font: { family: 'Outfit' } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Outfit', weight: '600' } }
+                }
+            }
+        }
+    });
+});
+</script>
 {% endblock %}

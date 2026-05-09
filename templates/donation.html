@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Faire un Don - Teranga 2027{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <h2 style="text-align: center; color: #17458F; margin-bottom: 20px;"><i class="fa-solid fa-hand-holding-dollar"></i> Faire un Don</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">Votre générosité fait la différence pour le District 9101.</p>
+
+        <form method="POST" action="{% url 'core:make_donation' %}">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Montant (FCFA) *</label>
+                <input type="number" name="amount" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1.1rem;" placeholder="Ex: 10000">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Pour qui faites-vous ce don ? *</label>
+                <select name="beneficiary_type" id="beneficiary_type" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px;" onchange="toggleBeneficiaryFields()">
+                    <option value="soi">Pour moi-même</option>
+                    <option value="club">Pour mon/un club</option>
+                    <option value="personne">Pour une autre personne</option>
+                    <option value="organisation">Pour une organisation</option>
+                </select>
+            </div>
+
+            <div id="club_field" style="margin-bottom: 20px; display: none;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Sélectionnez le club</label>
+                <select name="beneficiary_club" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px;">
+                    <option value="">-- Choisir un club --</option>
+                    {% for club in clubs %}
+                    <option value="{{ club.id }}">{{ club.name }} ({{ club.country }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="name_field" style="margin-bottom: 20px; display: none;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Nom du bénéficiaire (Personne ou Organisation)</label>
+                <input type="text" name="beneficiary_name" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Message (Optionnel)</label>
+                <textarea name="message" rows="3" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px;" placeholder="Laissez un mot d'encouragement..."></textarea>
+            </div>
+
+            <div style="margin-bottom: 30px; display: flex; align-items: center;">
+                <input type="checkbox" name="is_anonymous" id="is_anonymous" style="margin-right: 10px; width: 18px; height: 18px;">
+                <label for="is_anonymous" style="color: #666;">Je souhaite que ce don reste anonyme</label>
+            </div>
+
+            <button type="submit" style="width: 100%; padding: 15px; background: #F7A81B; color: #fff; font-weight: bold; font-size: 1.1rem; border: none; border-radius: 6px; cursor: pointer;">
+                Procéder au Paiement
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleBeneficiaryFields() {
+    var type = document.getElementById('beneficiary_type').value;
+    document.getElementById('club_field').style.display = (type === 'club') ? 'block' : 'none';
+    document.getElementById('name_field').style.display = (type === 'personne' || type === 'organisation') ? 'block' : 'none';
+}
+</script>
+{% endblock %}

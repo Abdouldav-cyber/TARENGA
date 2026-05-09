@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Programme - Teranga 2027{% endblock %}
+
+{% block content %}
+<div class="hero-section fade-in-up" style="margin-top: 10px; padding: 40px 20px; background: radial-gradient(circle at top, #f0f8ff, transparent 70%); border-radius: 24px; margin-bottom: 30px;">
+    <h1 style="font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 10px;">Programme <span style="color: #1565c0;">Officiel</span></h1>
+    <p class="subtitle" style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+        Découvrez l'agenda interactif de l'événement.
+    </p>
+</div>
+
+<div class="glass-card form-card" style="max-width: 900px; margin: 0 auto; margin-bottom: 50px;">
+    {% if not days %}
+        <div style="text-align: center; padding: 40px; color: #94a3b8;">
+            <i class="fa-solid fa-calendar-xmark" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <p>Le programme n'a pas encore été publié. Revenez bientôt !</p>
+        </div>
+    {% else %}
+        {% for day in days %}
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 1.5rem; color: #1e293b; border-bottom: 2px solid var(--color-primary); padding-bottom: 10px; margin-bottom: 20px;">
+                {{ day.date|date:"l d F Y" }} - <span style="color: var(--color-primary);">{{ day.title }}</span>
+                <span class="badge" style="float: right; background: #e2e8f0; color: #475569; font-size: 0.8rem;">{{ day.event.name }}</span>
+            </h2>
+            
+            {% if day.sessions.count == 0 %}
+                <p style="color: #64748b; font-style: italic;">Aucune session planifiée pour cette journée.</p>
+            {% else %}
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    {% for session in day.sessions.all %}
+                    <div style="display: flex; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s;">
+                        <div style="background: var(--color-primary); color: white; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 120px; font-weight: 700;">
+                            <span style="font-size: 1.2rem;">{{ session.start_time|time:"H:i" }}</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">à {{ session.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div style="padding: 20px; flex: 1;">
+                            <h3 style="margin: 0 0 5px 0; font-size: 1.2rem; color: #0f172a;">{{ session.title }}</h3>
+                            
+                            {% if session.location or session.speakers %}
+                            <div style="display: flex; gap: 20px; margin-bottom: 10px; font-size: 0.85rem; color: #64748b;">
+                                {% if session.location %}
+                                <span><i class="fa-solid fa-location-dot" style="color: var(--color-primary);"></i> {{ session.location }}</span>
+                                {% endif %}
+                                {% if session.speakers %}
+                                <span><i class="fa-solid fa-microphone" style="color: #f59e0b;"></i> {{ session.speakers }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if session.description %}
+                            <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin: 0;">{{ session.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

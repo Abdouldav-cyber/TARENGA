@@ -1,0 +1,46 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="header">
+    <div>
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Répertoire des Clubs</h1>
+        <p style="color: #64748b; margin-top: 5px;">Consultez la liste des clubs enregistrés.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'core:export_clubs' %}" class="action-btn" style="background: white; border: 1px solid #e2e8f0; color: #475569; font-size: 1rem;"><i class="fa-solid fa-file-csv"></i> Exporter CSV</a>
+        <a href="/admin/core/club/add/" target="_blank" class="action-btn btn-validate" style="font-size: 1rem;"><i class="fa-solid fa-plus"></i> Ajouter un Club</a>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nom du Club</th>
+            <th>Type</th>
+            <th>Pays / Ville</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for club in page_obj %}
+        <tr>
+            <td><strong>{{ club.name }}</strong></td>
+            <td><span class="badge" style="background: #e2e8f0; color: #475569;">{{ club.get_club_type_display }}</span></td>
+            <td>{{ club.country }} - {{ club.city|default:"-" }}</td>
+            <td>
+                {% if club.is_active %}
+                    <span class="badge badge-success">Actif</span>
+                {% else %}
+                    <span class="badge badge-danger">Inactif</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align: center; padding: 40px; color: #94a3b8;">Aucun club enregistré pour le moment.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% include "custom_admin/pagination.html" with page_obj=page_obj %}
+{% endblock %}

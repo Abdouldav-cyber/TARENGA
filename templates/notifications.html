@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Teranga 2027{% endblock %}
+
+{% block content %}
+<div class="hero-section fade-in-up" style="margin-top: 10px; padding: 20px;">
+    <h1 style="font-size: 2rem;">Vos <span style="color: #1565c0;">Notifications</span></h1>
+</div>
+
+<div class="glass-card form-card" style="max-width: 800px; margin: 0 auto; margin-bottom: 50px; padding: 20px;">
+    {% if not notifications %}
+        <div style="text-align: center; padding: 40px; color: #94a3b8;">
+            <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <p>Vous n'avez aucune notification.</p>
+        </div>
+    {% else %}
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            {% for notif in notifications %}
+            <div style="padding: 15px; border-radius: 12px; background: {% if not notif.is_read %}#f0f9ff{% else %}#f8fafc{% endif %}; border: 1px solid {% if not notif.is_read %}#bae6fd{% else %}#e2e8f0{% endif %}; position: relative;">
+                
+                <div style="display: flex; gap: 15px; align-items: flex-start;">
+                    <div style="font-size: 1.5rem; margin-top: 5px;">
+                        {% if notif.type_notif == 'payment' %}
+                            <i class="fa-solid fa-money-bill-wave" style="color: #10b981;"></i>
+                        {% elif notif.type_notif == 'alert' %}
+                            <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                        {% else %}
+                            <i class="fa-solid fa-circle-info" style="color: #3b82f6;"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 style="margin: 0 0 5px 0; font-size: 1.1rem; color: #0f172a;">{{ notif.title }}</h3>
+                        <p style="margin: 0; color: #475569; font-size: 0.95rem;">{{ notif.message }}</p>
+                        <span style="display: block; margin-top: 8px; font-size: 0.8rem; color: #94a3b8;">{{ notif.created_at|timesince }}</span>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -160,7 +160,53 @@
         </div>
     </div>
 
+    {% if homepage_content and homepage_content.banner_image %}
+    <style>
+        .premium-hero {
+            background: linear-gradient(rgba(240,248,255,0.9), rgba(240,248,255,0.95)), url('{{ homepage_content.banner_image.url }}') center/cover !important;
+        }
+    </style>
+    {% endif %}
+
     <h1>L'Expérience <span style="color:#1565c0;">Téranga Pûre</span></h1>
+    
+    {% if homepage_content.governor_word or homepage_content.rrd_word %}
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; max-width: 900px; margin-left: auto; margin-right: auto;">
+        {% if homepage_content.governor_word %}
+        <div class="glass-card" style="flex: 1; min-width: 300px; text-align: left; padding: 25px;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                {% if homepage_content.governor_photo %}
+                <img src="{{ homepage_content.governor_photo.url }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-rotary);">
+                {% else %}
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-rotary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem;">G</div>
+                {% endif %}
+                <div>
+                    <h3 style="margin:0; font-size: 1.1rem;">Mot du Gouverneur</h3>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">District 9101</span>
+                </div>
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.5; font-style: italic; color: #475569;">"{{ homepage_content.governor_word }}"</p>
+        </div>
+        {% endif %}
+
+        {% if homepage_content.rrd_word %}
+        <div class="glass-card" style="flex: 1; min-width: 300px; text-align: left; padding: 25px; border-color: var(--color-rotaract);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                {% if homepage_content.rrd_photo %}
+                <img src="{{ homepage_content.rrd_photo.url }}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-rotaract);">
+                {% else %}
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--color-rotaract); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.5rem;">R</div>
+                {% endif %}
+                <div>
+                    <h3 style="margin:0; font-size: 1.1rem;">Mot du RRD</h3>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">Rotaract</span>
+                </div>
+            </div>
+            <p style="font-size: 0.95rem; line-height: 1.5; font-style: italic; color: #475569;">"{{ homepage_content.rrd_word }}"</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
     
     {% if request.user.is_authenticated %}
         <p class="subtitle" style="color: #4CAF50; font-weight: bold;">
